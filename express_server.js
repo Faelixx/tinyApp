@@ -1,4 +1,5 @@
 const express = require("express");
+const { url } = require("inspector");
 const app = express();
 const PORT = 1337;
 
@@ -45,6 +46,11 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 });
 
+app.post('/urls/:id', (req, res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect('/urls');
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -56,7 +62,6 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  console.log("test");
   res.redirect(longURL);
 });
 

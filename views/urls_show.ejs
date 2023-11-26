@@ -25,6 +25,18 @@
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
       </div>
+    <div class="card text-center"></div>
+      <div class="mx-auto pb-2">
+        <h5 class="card-title" style="color:gray">Edit</h5>
+        <form class="form-inline row" action="/urls/<%= id %>" method="POST">
+          <div class="form-group">
+          <label for="newURL" class="col-sm0-2">New URL:</label>
+          <input type="text" name="longURL"  class="form-control mx-sm-3" id="newURL" value="<%= longURL[id] %>">
+          <input type="submit" class="col-sm0-2" value="Submit">
+          </div>
+        </form>
+      </div>
+    </div>
       <div class="card-footer text-muted"></div>
     </div>
     <!-- Bootstrap JS-->
