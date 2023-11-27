@@ -51,6 +51,12 @@ app.post('/urls/:id', (req, res) => {
   res.redirect('/urls');
 });
 
+app.post('/login', (req, res) => {
+  const userCookie = req.body.username;
+  res.cookie('username', userCookie);
+  res.redirect('/urls');
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
