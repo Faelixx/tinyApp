@@ -2,7 +2,9 @@ const express = require("express");
 const { url } = require("inspector");
 const app = express();
 const PORT = 1337;
+const cookieParser = require('cookie-parser') 
 
+app.use(cookieParser());
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -30,7 +32,7 @@ app.get('/', (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { username: req.cookies["username"], urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
