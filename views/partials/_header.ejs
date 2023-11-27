@@ -26,9 +26,10 @@
     </form>
     <% }; %>
     <% if (username) { %>
-      <form class="form-inline">
+      <form class="form-inline" action="/logout" method="POST">
         <div class="form-group">
-          <p name="loginMessage">Logged in as <%= username[0] %>!</p><input type="submit" name="logout" id="logout" value="Logout">
+          <p name="loginMessage">Logged in as <%= username[0] %>!</p>
+          <input type="submit" name="username" id="username" value="Logout">
         </div>
       </form>
       <% }; %>
