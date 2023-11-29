@@ -71,6 +71,15 @@ app.post("/register", (req, res) => {
   };
   userDatabase[newUserId] = newUser;
   const userCookie = newUser;
+  if (req.body.email === "" || req.body.password === "") {
+    res.status(400).send('please provide an email AND paswword.')
+  }
+
+  for (let user in userDatabase) {
+    if (userDatabase[user]["email"] === req.body.email) {
+      res.status(400).send('Email adrress has already been regisered')
+    }
+  }
   res.cookie('user_id', userCookie);
   res.redirect('/urls');
 });
