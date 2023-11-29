@@ -5,6 +5,7 @@ const PORT = 1337;
 const cookieParser = require('cookie-parser') 
 
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -12,13 +13,13 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const users = {
-  userRandomID: {
+const userDatabase = {
+  abc: {
     id: "abc",
     email: "a@a.com",
     password: "123",
   },
-  user2RandomID: {
+  def: {
     id: "def",
     email: "b@b.com",
     password: "456",
@@ -38,7 +39,6 @@ const generateRandomString = function() {
   return result;
 };
 
-app.use(express.urlencoded({ extended: true }));
 
 
 app.get('/', (req, res) => {
@@ -46,13 +46,33 @@ app.get('/', (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { username: req.cookies["username"], urls: urlDatabase };
+  const templateVars = {  urls: urlDatabase , user_id: null};
+  if(req.cookies["user_id"]) {
+    templateVars.user_id = req.cookies["user_id"]["email"];
+  };
+
   res.render("urls_index", templateVars);
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = {user_id: null}
+  if (req.cookies["user_id"]) {
+    templateVars.user_id = req.cookies["user_id"]["email"];
+  }
   res.render("urls_register", templateVars);
+});
+
+app.post("/register", (req, res) => {
+  const newUserId = generateRandomString();
+  const newUser = {
+    username: newUserId,
+    email: req.body.email,
+    password: req.body.password
+  };
+  userDatabase[newUserId] = newUser;
+  const userCookie = newUser;
+  res.cookie('user_id', userCookie);
+  res.redirect('/urls');
 });
 
 app.post("/urls", (req, res) => {
@@ -73,13 +93,17 @@ app.post('/urls/:id', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const userCookie = req.body.username;
-  res.cookie('username', userCookie);
-  res.redirect('/urls');
+  for (let user in userDatabase) {
+    if (user === req.body.user_id[0]) {
+      const userCookie = userDatabase[user]
+      res.cookie("user_id", userCookie);
+      }
+    } 
+    res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 

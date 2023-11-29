@@ -18,19 +18,19 @@
       <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       <a class="nav-item nav-link" href="/register">Register Account</a>
     </div>
-    <% if (!username) { %>
+    <% if (!user_id) { %>
     <form class="form-inline row" action="/login" method="POST">
       <div class="form-group">
-      <input type="text" name="username" class="form-control mx-sm-3" id="username" placeholder="Username">
-      <input type="submit" name="username" class="col-sm0-2" value="Login">
+      <input type="text" name="user_id" class="form-control mx-sm-3" id="user_id" placeholder="Username">
+      <input type="submit" name="user_id" class="col-sm0-2" value="Login">
       </div>
     </form>
     <% }; %>
-    <% if (username) { %>
+    <% if (user_id) { %>
       <form class="form-inline" action="/logout" method="POST">
         <div class="form-group">
-          <p name="loginMessage">Logged in as <%= username[0] %>!</p>
-          <input type="submit" name="username" id="username" value="Logout">
+          <p name="loginMessage">Logged in as <%= user_id %>!</p>
+          <input type="submit" name="user_id" id="username" value="Logout">
         </div>
       </form>
       <% }; %>
