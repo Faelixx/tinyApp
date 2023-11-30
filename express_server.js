@@ -26,7 +26,6 @@ const userDatabase = {
   },
 };
 
-// Finish this function to help DRY code.
 const userLookup = function(userRef, userItem) {
   let result;
   for (let user in userDatabase) {
@@ -71,9 +70,14 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const newUrl = generateRandomString();
-  urlDatabase[newUrl] = req.body.longURL;
-  res.redirect(`/urls/${newUrl}`); 
+  if (req.cookies["user_id"]) {
+    const newUrl = generateRandomString();
+    urlDatabase[newUrl] = req.body.longURL;
+    res.redirect(`/urls/${newUrl}`); 
+  } 
+  if (!req.cookies["user_id"]) {
+    res.status(403).send("Must be logged in to create URLs.");
+    }
 });
 
 app.post('/urls/:id/delete', (req, res) => {
@@ -112,7 +116,7 @@ app.get('/', (req, res) => {
 app.get('/login', (req, res) => {
   const templateVars = {  urls: urlDatabase , user_id: null};
   if(req.cookies["user_id"]) {
-    templateVars.user_id = req.cookies["user_id"]["email"];
+    res.redirect("/urls");
   };
   res.render("urls_login", templateVars)
 });
@@ -121,6 +125,9 @@ app.get("/urls", (req, res) => {
   const templateVars = {  urls: urlDatabase , user_id: null};
   if(req.cookies["user_id"]) {
     templateVars.user_id = req.cookies["user_id"]["email"];
+  }
+  if(!req.cookies["user_id"]) {
+    res.status(403).send("Please sign in to shorten urls.");
   };
 
   res.render("urls_index", templateVars);
@@ -128,25 +135,38 @@ app.get("/urls", (req, res) => {
 
 app.get("/register", (req, res) => {
   const templateVars = {user_id: null}
-  if (req.cookies["user_id"]) {
-    templateVars.user_id = req.cookies["user_id"]["email"];
-  }
+  if(req.cookies["user_id"]) {
+    res.redirect("/urls");
+  };
   res.render("urls_register", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { user_id: req.cookies["user_id"] };
+  if(!req.cookies["user_id"]) {
+    res.redirect("/login");
+  };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase, user_id: req.cookies["user_id"] }
-  res.render("urls_show", templateVars);
+  if (!req.cookies["user_id"]) {
+    res.status(403).send("Must be logged in to create URLs.");
+    }
+  if (req.cookies["user_id"]) {
+    const templateVars = { id: req.params.id, longURL: urlDatabase, user_id: req.cookies["user_id"] }
+    res.render("urls_show", templateVars);
+  }
 });
 
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  let longURL;
+    if (urlDatabase[req.params.id]) {
+      longURL = urlDatabase[req.params.id];
+      res.redirect(longURL);
+    } else {
+      res.status(404).send("Shortened url does not exist.");
+    }
 });
 
 app.get('/urls.json', (req, res) => {
