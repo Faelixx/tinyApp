@@ -1,13 +1,13 @@
 const express = require("express");
-const { url } = require("inspector");
-// const cookieParser = require('cookie-parser');
+
+
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = 1337;
 
-app.use (cookieSession ({
+app.use(cookieSession({
   name: 'session',
   keys: ['ahfjs', 'ajsdfha', '1893hg'],
 
@@ -28,12 +28,12 @@ const mustLogin = "Must be logged in to manage URLs.";
 const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
-    userID: "abc" 
+    userID: "abc"
   },
   "9sm5xK": {
     longURL: "http://www.google.com",
     userID: "def"
-  } 
+  }
 };
 
 const userDatabase = {
@@ -62,7 +62,7 @@ const userLookup = function(userRef, userItem) {
       return result;
     }
   }
-}
+};
 
 const generateRandomString = function() {
   let result = '';
@@ -80,9 +80,9 @@ const urlsForUser = function(id) {
   let result = false;
   for (let urlId in urlDatabase) {
     if (id === urlDatabase[urlId].userID) {
-      result = true
+      result = true;
       return result;
-    };
+    }
 
   }
 };
@@ -99,9 +99,9 @@ app.post('/urls/:id/delete', (req, res) => {
         const deletedItem = req.params.id;
         delete urlDatabase[deletedItem];
         res.redirect('/urls');
-      } 
+      }
     } res.status(400).send("Invalid command (Cannot delete URLS you did not create)");
-  } res.status(403).send(mustLogin)
+  } res.status(403).send(mustLogin);
 });
 
 app.post("/register", (req, res) => {
@@ -113,9 +113,9 @@ app.post("/register", (req, res) => {
     hashedPassword: bcrypt.hashSync(req.body.password, 10)
   };
   if (req.body.email === "" || req.body.password === "") {
-    res.status(403).send('please provide an email AND paswword.')
+    res.status(403).send('please provide an email AND paswword.');
   }
-  
+
   if (userLookup(req.body.email, "email")) {
     res.status(403).send('Email address has already been registered.');
   } else {
@@ -156,8 +156,8 @@ app.post('/login', (req, res) => {
         }
       }
     }
-  }
-  else if(!userLookup(email, "email") || !userLookup(password, "hashedPassword")) {
+
+  } else if (!userLookup(email, "email") || !userLookup(password, "hashedPassword")) {
     res.status(403).send("Invalid email/password");
   }
 });
@@ -169,11 +169,11 @@ app.post("/urls", (req, res) => {
       userID: req.session.userID["id"]
     };
     urlDatabase[newUrl].longURL = req.body.longURL;
-    res.redirect(`/urls/${newUrl}`); 
-  } 
+    res.redirect(`/urls/${newUrl}`);
+  }
   if (!req.session.userID) {
     res.status(403).send(mustLogin);
-    }
+  }
 });
 
 
@@ -186,16 +186,16 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-  const templateVars = {  user_id: null };
-  if(req.session.userID) {
+  const templateVars = { user_id: null };
+  if (req.session.userID) {
     res.redirect("/urls");
-  };
-  res.render("urls_login", templateVars)
+  }
+  res.render("urls_login", templateVars);
 });
 
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: {}, user_id: null }
+  const templateVars = { id: req.params.id, longURL: {}, user_id: null };
   if (req.session.userID) {
     templateVars.user_id = req.session.userID["email"];
     for (let id in urlDatabase) {
@@ -206,31 +206,31 @@ app.get("/urls/:id", (req, res) => {
         }
         res.render("urls_show", templateVars);
       }
-    } res.status(400).send("Cannot edit urls you did not create or that do not exist.")
+    } res.status(400).send("Cannot edit urls you did not create or that do not exist.");
   } res.status(403).send(mustLogin);
 });
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { user_id: req.session.userID["email"] };
-  if(!req.session.userID) {
+  if (!req.session.userID) {
     res.redirect("/login");
-  };
+  }
   res.render("urls_new", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
   let longURL;
-    if (urlDatabase[req.params.id]) {
-      longURL = urlDatabase[req.params.id];
-      res.redirect(longURL);
-    } else {
-      res.status(404).send("Shortened url does not exist.");
-    }
+  if (urlDatabase[req.params.id]) {
+    longURL = urlDatabase[req.params.id];
+    res.redirect(longURL);
+  } else {
+    res.status(404).send("Shortened url does not exist.");
+  }
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = {  urls: {} , user_id: null };
-  if(req.session.userID) {
+  const templateVars = { urls: {}, user_id: null };
+  if (req.session.userID) {
     templateVars.user_id = req.session.userID["email"];
     for (let id in urlDatabase) {
       if (urlDatabase[id].userID === req.session.userID["id"]) {
@@ -239,16 +239,16 @@ app.get("/urls", (req, res) => {
     }
     res.render("urls_index", templateVars);
   }
-  if(!req.session.userID) {
+  if (!req.session.userID) {
     res.status(403).send(mustLogin);
   }
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = {user_id: null}
-  if(req.session.userID) {
+  const templateVars = { user_id: null };
+  if (req.session.userID) {
     res.redirect("/urls");
-  };
+  }
   res.render("urls_register", templateVars);
 });
 
@@ -257,7 +257,7 @@ app.get('/urls.json', (req, res) => {
 });
 
 app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b> World</b></body></html>\n')
+  res.send('<html><body>Hello <b> World</b></body></html>\n');
 });
 
 app.listen(PORT, () => {
