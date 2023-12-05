@@ -39,6 +39,7 @@ const urlsForUser = function(id, database) {
     }
 
   }
+  return result;
 };
 
 

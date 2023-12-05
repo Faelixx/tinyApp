@@ -1,13 +1,12 @@
+const PORT = 1337;
+
 const express = require("express");
-
-
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
-
-const { getUserByEmail, userLookup, generateRandomString, urlsForUser  } = require('./helpers.js');
-
 const app = express();
-const PORT = 1337;
+
+app.use(express.urlencoded({ extended: true }));
+app.set("view engine", "ejs");
 
 app.use(cookieSession({
   name: 'session',
@@ -15,44 +14,15 @@ app.use(cookieSession({
 
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
-app.use(express.urlencoded({ extended: true }));
-app.set("view engine", "ejs");
+
+const { getUserByEmail, userLookup, generateRandomString, urlsForUser  } = require('./helpers.js');
+const { urlDatabase, userDatabase } = require('./databases.js');
+
 
 ///////
 // Error code messages
 //////
 const mustLogin = "Must be logged in to manage URLs.";
-
-///////
-// Databases
-///////
-
-const urlDatabase = {
-  "b2xVn2": {
-    longURL: "http://www.lighthouselabs.ca",
-    userID: "abc"
-  },
-  "9sm5xK": {
-    longURL: "http://www.google.com",
-    userID: "def"
-  }
-};
-
-const userDatabase = {
-  abc: {
-    id: "abc",
-    email: "a@a.com",
-    password: "123",
-    hashedPassword: bcrypt.hashSync("123", 10)
-  },
-  def: {
-    id: "def",
-    email: "b@b.com",
-    password: "456",
-    hashedPassword: bcrypt.hashSync("456", 10)
-  },
-};
-
 
 
 ///////
@@ -102,9 +72,10 @@ app.post("/register", (req, res) => {
 app.get("/u/:id", (req, res) => {
   let longURL;
   if (urlDatabase[req.params.id]) {
-    longURL = urlDatabase[req.params.id];
+    longURL = urlDatabase[req.params.id]["longURL"];
     return res.redirect(longURL);
   } else {
+    console.log(req.params.id);
     return res.status(404).send("Shortened url does not exist.");
   }
 });
@@ -167,7 +138,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  req.session.userID = null;
+  req.session = null;
   res.redirect('/login');
 });
 
@@ -187,8 +158,9 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: {}, user_id: req.session.userID["email"] };
+  const templateVars = { id: req.params.id, longURL: {} };
   if (req.session.userID) {
+    templateVars.user_id = req.session.userID["email"];
     let foundURL = false;
     for (let id in urlDatabase) {
       if (urlDatabase[id].userID === req.session.userID["id"]) {
@@ -206,24 +178,15 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post('/urls/:id', (req, res) => {
-  if (urlsForUser(req.session.userID["id"], userDatabase)) {
-    let foundURL = false;
-    for (let id in urlDatabase) {
-      if (urlDatabase[id].userID === req.session.userID["id"]) {
-        urlDatabase[id].longURL = req.body.longURL;
-        foundURL = true;
-      }
+  if (urlsForUser(req.session.userID["id"], urlDatabase)) {
+      if (urlDatabase[req.params.id].userID === req.session.userID["id"]) {
+        urlDatabase[req.params.id].longURL = req.body.longURL;
+        res.redirect('/urls');
     }
-    if (!foundURL) {
-      return res.status(404);
-    }
-    res.redirect('/urls');
   } else {
     return res.status(400);
   }
 });
-
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
