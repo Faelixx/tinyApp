@@ -13,8 +13,8 @@ https://localhost:1337/u/6hagm8 ---Directed To---> http://www.facebook.com .
 
 ## Final Product
 
-!["User Login Page"](https://ibb.co/RYptzbL)
-!["User URL list"](https://ibb.co/NKrrbMF)
+!["User Login Page"](docs\url login page.png)
+!["User URL list"](docs\url list.png)
 
 ## Purpose
 
@@ -34,5 +34,5 @@ This project was created and published by me as part of my learnings at Lighthou
 ## Getting Started
 
 - Install all dependencies (using the `npm install` command).
-- Run the development web server using the `node express_server.js` command.
+- Run the development web server using the `npm start` command.
 - Server port is set to 1337 by default, reassign port value to however seen fit.
