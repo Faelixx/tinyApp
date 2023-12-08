@@ -34,7 +34,8 @@ app.get('/', (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { user_id: null };
+  // user_id set to null to make web page header clear
+  const templateVars = { user_id: {} };
   if (req.session.userID) {
     return res.redirect("/urls");
   }
@@ -131,7 +132,7 @@ app.post('/login', (req, res) => {
         }
       }
     }
-
+    // check for both username and password to prevent brute force hacking
   } else if (!getUserByEmail(email, userDatabase) || !userLookup(password, "hashedPassword", userDatabase)) {
     return res.status(403).send("Invalid email/password");
   }
