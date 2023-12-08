@@ -13,8 +13,8 @@ https://localhost:1337/u/6hagm8 ---Directed To---> http://www.facebook.com .
 
 ## Final Product
 
-!["User Login Page"](docs\url login page.png)
-!["User URL list"](docs\url list.png)
+!["User Login Page"](https://github.com/Faelixx/tinyApp/blob/main/docs/url%20login%20page.png?raw=true)
+!["User URL list"](https://github.com/Faelixx/tinyApp/blob/main/docs/url%20list.png?raw=true)
 
 ## Purpose
 
